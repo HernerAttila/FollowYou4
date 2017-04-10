@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="userId" type="string">ia95ir</item>
+    <item name="LteEnabled" type="bool">true</item>
+    <item name="pufferMaxSize" type="integer">200</item>
+</resources>
