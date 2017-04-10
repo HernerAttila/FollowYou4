@@ -1,6 +1,4 @@
 package com.example.torpe.followyou;
-
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -77,6 +75,7 @@ public class ServerCommunication {
             Log.e("IOException", e4.toString());
             e4.printStackTrace();
         }*/
+        Log.e("sendLocationDataResult:",result);
         return result;
     }
 

@@ -13,7 +13,7 @@ import java.util.Calendar;
  */
 
 public class DataCollector {
-    SimpleDateFormat df = new SimpleDateFormat("y.MM.dd HH:mm:ss");
+    SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
     protected SendDataObject dataObject;
     protected TrackGPS gps;
 

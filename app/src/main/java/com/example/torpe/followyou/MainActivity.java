@@ -28,8 +28,9 @@ public class MainActivity extends AppCompatActivity {
     protected ServerCommunication serverCommunication;
     protected TrackGPS gps;
     protected DataCollector dataCollector;
+    protected Puffer puffer;
     protected SendDataObject sendDataObject;
-    private final static int INTERVAL = 100 * 60 * 2; //2 minutes
+    private final static int INTERVAL = 1000 * 30 * 1; //0,5 minutes
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +39,9 @@ public class MainActivity extends AppCompatActivity {
         this.config = new Config(MainActivity.this);
         config.setNewConfig();
         this.dataCollector = new DataCollector(MainActivity.this);
+        this.puffer = new Puffer(MainActivity.this);
         this.userId = config.getUserId();
         this.serverCommunication = new ServerCommunication(MainActivity.this);
-        //followYouService();
         Timer myTimer = new Timer();
         myTimer.schedule(new TimerTask() {
             @Override
@@ -53,34 +54,29 @@ public class MainActivity extends AppCompatActivity {
         btnGetData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                followYouService();
+                updateUI();
             }
         });
     }
 
     public void followYouService(){
         sendDataObject = this.dataCollector.collectData();
-        /*
+        if(serverCommunication.isConnected()) {
+            List<SendDataObject> sendDataArray = new ArrayList<SendDataObject>();
+            sendDataArray.add(sendDataObject);
+            serverCommunication.sendLocationData(sendDataArray);
+        }else{
+            this.puffer.add(sendDataObject);
+        }
+    }
+
+    void updateUI(){
         TextView lattitudeTextView = (TextView) findViewById(R.id.lattitudeTextView);
         TextView longitudeTextView = (TextView) findViewById(R.id.longitudeTextView);
         TextView timerTextView = (TextView) findViewById(R.id.timerTextView);
         lattitudeTextView.setText(new Double(sendDataObject.Latitude).toString());
         longitudeTextView.setText(new Double(sendDataObject.Longitude).toString());
         timerTextView.setText(sendDataObject.Time);
-        */
-        List<SendDataObject> sendDataArray = new ArrayList<SendDataObject>();
-        sendDataArray.add(sendDataObject);
-        serverCommunication.sendLocationData(sendDataArray);
-    }
-
-    void getGPS(){
-        this.gps = new TrackGPS(MainActivity.this);
-        if(gps.canGetLocation()) {
-            gps.getLocation();
-        }
-        else {
-            gps.showSettingsAlert();
-        }
     }
 
 }
