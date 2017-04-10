@@ -17,6 +17,8 @@ public class ConfigThread implements Runnable {
     public void run() {
         ServerCommunication serverCommunication = new ServerCommunication(this.context);
         String result = serverCommunication.getConfigData();
+
         Log.e("ConfigThread",result);
+        MainActivity.config.setNewConfig(result);
     }
 }

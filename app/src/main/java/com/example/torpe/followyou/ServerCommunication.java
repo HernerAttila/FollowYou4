@@ -36,7 +36,7 @@ public class ServerCommunication {
     private HttpClient httpclient;
 
     public ServerCommunication(Context context) {
-        this.userid = MainActivity.config.getUserId();
+        this.userid = MainActivity.config.userId;
         this.getConnection();
         this.mContext = context;
     }
@@ -49,8 +49,8 @@ public class ServerCommunication {
         InputStream inputStream = null;
         String result = "";
         Log.e ("bla",this.gson.toJson(sendDataArray));
-        /*try {
-            HttpPost httpPost = new HttpPost("http://followyou.eu/webservice/saver.php");
+        try {
+            HttpPost httpPost = new HttpPost("https://followyou.eu/webservice/saver.php");
             String json = this.gson.toJson(sendDataArray);
             StringEntity se = new StringEntity(json);
             httpPost.setEntity(se);
@@ -74,7 +74,7 @@ public class ServerCommunication {
         } catch (IOException e4) {
             Log.e("IOException", e4.toString());
             e4.printStackTrace();
-        }*/
+        }
         Log.e("sendLocationDataResult:",result);
         return result;
     }
@@ -83,7 +83,7 @@ public class ServerCommunication {
         InputStream inputStream = null;
         String result = "";
         try {
-            HttpPost httpPost = new HttpPost("http://followyou.eu/webservice/check.php");
+            HttpPost httpPost = new HttpPost("https://followyou.eu/webservice/check.php");
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
             nameValuePairs.add(new BasicNameValuePair("userId", this.userid));
             httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));

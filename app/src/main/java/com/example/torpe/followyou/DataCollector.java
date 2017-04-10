@@ -1,10 +1,6 @@
 package com.example.torpe.followyou;
 
-import android.Manifest;
 import android.content.Context;
-import android.widget.TextView;
-import android.view.View;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -26,7 +22,7 @@ public class DataCollector {
         Calendar c = Calendar.getInstance();
         String formattedDate = df.format(c.getTime());
         gps.getLocation();
-        dataObject = new SendDataObject(gps.getLatitude(),gps.getLongitude(),formattedDate,MainActivity.config.getUserId(),0);
+        dataObject = new SendDataObject(gps.getLatitude(),gps.getLongitude(),formattedDate,MainActivity.config.userId,0);
         return  dataObject;
     }
 }

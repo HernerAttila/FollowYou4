@@ -1,12 +1,14 @@
 package com.example.torpe.followyou;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import com.google.gson.Gson;
 
 
 /**
@@ -15,42 +17,45 @@ import java.util.Date;
 
 public class Config {
     private Context mContext;
-    protected boolean LteEnabled;
-    protected int pufferMaxSize;
-    protected String userId;
+    private Gson gson = new Gson();
+
+    public String userId;
     SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-    protected Time maxTime;
+    private SharedPreferences prefs;
+    String sendingDaysKey = "com.example.torpe.followyou.sending_days";
+    String intervallumKey = "com.example.torpe.followyou.intervallum";
 
 
-    public Config(Context context){
-        this.mContext = context;
-        this.LteEnabled = this.mContext.getResources().getBoolean(R.bool.LteEnabled);
+    public Config(Context context) {
+        mContext = context;
+        prefs = context.getSharedPreferences("com.example.torpe.followyou", Context.MODE_PRIVATE);
         try {
             Date date = df.parse(this.mContext.getResources().getString(R.string.maxTime));
-            maxTime = new Time(date.getHours(),date.getMinutes(),0);
-            Log.e("Config:", maxTime.toString());
-        }
-        catch(ParseException ex){
+            //maxTime = new Time(date.getHours(),date.getMinutes(),0);
+            //Log.e("Config:", maxTime.toString());
+        } catch (ParseException ex) {
             ex.printStackTrace();
         }
-        this.pufferMaxSize = this.mContext.getResources().getInteger(R.integer.pufferMaxSize);
-        this.userId = this.mContext.getResources().getString(R.string.userId);
+        userId = mContext.getResources().getString(R.string.userId);
     }
 
-    public void setNewConfig(){
-        Runnable r = new ConfigThread(this.mContext);
+    public void getNewConfig() {
+        Runnable r = new ConfigThread(mContext);
         new Thread(r).start();
     }
 
-    public boolean isLteEnabled() {
-        return LteEnabled;
+    public void setNewConfig(String dataStr) {
+        GetDataObject dataObject = (gson.fromJson(dataStr, GetDataObject.class));
+        prefs.edit().putInt(intervallumKey, dataObject.intervallum).commit();
+        prefs.edit().putString(sendingDaysKey, dataObject.sending_days).commit();
+        Log.e("setNewConfig:", "");
     }
 
-    public int getPufferMaxSize() {
-        return pufferMaxSize;
+    public int getIntervallum() {
+        return prefs.getInt(intervallumKey, 5);
     }
 
-    public String getUserId() {
-        return userId;
+    public String sendingDays() {
+        return prefs.getString(sendingDaysKey, "");
     }
 }

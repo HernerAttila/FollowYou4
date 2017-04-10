@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.util.Log;
 
 public class TrackGPS extends Service implements LocationListener {
 
@@ -51,7 +52,6 @@ public class TrackGPS extends Service implements LocationListener {
             // getting GPS status
             isGPSEnabled = locationManager
                     .isProviderEnabled(LocationManager.GPS_PROVIDER);
-
             // getting network status
             isNetworkEnabled = locationManager
                     .isProviderEnabled(LocationManager.NETWORK_PROVIDER);

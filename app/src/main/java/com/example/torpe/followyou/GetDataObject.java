@@ -5,9 +5,17 @@ package com.example.torpe.followyou;
  */
 
 public class GetDataObject {
-    protected String userid;
+    public boolean is_user;
+    public boolean is_sender;
+    public String sending_days;
+    public int start_hour;
+    public int start_min;
+    public int end_hour;
+    public int end_min;
+    public int intervallum;
 
-    public GetDataObject(String userid){
-        this.userid = userid;
+    public GetDataObject(){
+
     }
+
 }
