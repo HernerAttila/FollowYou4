@@ -41,13 +41,20 @@ public class Config {
 
     public void setNewConfig(String dataStr) {
         GetDataObject dataObject = (gson.fromJson(dataStr, GetDataObject.class));
-        prefs.edit().putInt(intervallumKey, dataObject.intervallum).commit();
-        prefs.edit().putString(sendingDaysKey, dataObject.sending_days).commit();
-        Log.e("setNewConfig:", "");
+        if(dataObject.is_user) {
+            prefs.edit().putInt(intervallumKey, dataObject.intervallum).commit();
+            prefs.edit().putString(sendingDaysKey, dataObject.sending_days).commit();
+            //{"is_user":true,"is_sender":true,"sending_days":"1;2;3;4;5;","start_hour":7,"start_min":0,"end_hour":19,"end_min":0,"intervallum":3}
+        }
+        else{
+            FollowYou.stopService();
+        }
     }
 
     public int getIntervallum() {
-        return prefs.getInt(intervallumKey, 5);
+        int intervallum = prefs.getInt(intervallumKey, 1);
+        if (intervallum < 1) return 5;
+        return intervallum;
     }
 
     public String sendingDays() {

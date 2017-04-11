@@ -21,7 +21,6 @@ import java.util.TimerTask;
 public class FollowYou extends Service {
     public static Config config;
     protected ServerCommunication serverCommunication;
-    protected TrackGPS gps;
     protected DataCollector dataCollector;
     protected Puffer puffer;
     public SendDataObject sendDataObject;
@@ -39,18 +38,23 @@ public class FollowYou extends Service {
         super.onCreate();
         ctx = this;
         config = new Config(FollowYou.this);
+        dataCollector = new DataCollector(FollowYou.this);
+        puffer = new Puffer(FollowYou.this);
         serverCommunication = new ServerCommunication(FollowYou.this);
         if(serverCommunication.isConnected()) {
             config.getNewConfig();
         }
-        dataCollector = new DataCollector(FollowYou.this);
-        puffer = new Puffer(FollowYou.this);
         startService();
     }
 
     private void startService()
     {
         timer.scheduleAtFixedRate(new mainTask(), 0, 1000*60*config.getIntervallum());
+    }
+
+    public static void stopService(){
+        timer.cancel();
+        Log.e("stopService:","stopped");
     }
 
     private class mainTask extends TimerTask
@@ -60,10 +64,12 @@ public class FollowYou extends Service {
             sendDataObject = dataCollector.collectData();
             Puffer puffer = new Puffer(ctx);
             if(serverCommunication.isConnected()) {
-                List<SendDataObject> sendDataArray = new ArrayList<SendDataObject>();
-                puffer.getAll();
+                List<SendDataObject> sendDataArray = new ArrayList<SendDataObject>(puffer.getAll());
                 sendDataArray.add(sendDataObject);
-                serverCommunication.sendLocationData(sendDataArray);
+                String result = serverCommunication.sendLocationData(sendDataArray);
+                if (result.equals("1") && sendDataArray.size() > 1){
+                    puffer.clearPuffer();
+                }
             }else{
                 puffer.add(sendDataObject);
             }

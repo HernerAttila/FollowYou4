@@ -48,7 +48,7 @@ public class ServerCommunication {
     public String sendLocationData(List<SendDataObject> sendDataArray) {
         InputStream inputStream = null;
         String result = "";
-        Log.e ("bla",this.gson.toJson(sendDataArray));
+        Log.e ("sendLocationData",this.gson.toJson(sendDataArray));
         try {
             HttpPost httpPost = new HttpPost("https://followyou.eu/webservice/saver.php");
             String json = this.gson.toJson(sendDataArray);
@@ -75,7 +75,6 @@ public class ServerCommunication {
             Log.e("IOException", e4.toString());
             e4.printStackTrace();
         }
-        Log.e("sendLocationDataResult:",result);
         return result;
     }
 

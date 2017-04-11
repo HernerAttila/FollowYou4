@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -32,20 +33,26 @@ public class Puffer {
         writeToFile(json);
     }
 
-    public int getCount(){
-        return 0;
+    public void clearPuffer(){
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FollowYou.config.pufferFile, Context.MODE_PRIVATE));
+            outputStreamWriter.write("");
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
     }
 
     public List<SendDataObject> getAll(){
-        List<SendDataObject> allData = new ArrayList<SendDataObject>();
-        String json = readFromFile();
-        Log.e("getAll:", json);
-        return allData;
+        String json = '[' + readFromFile().replace("}{","},{") + ']';
+        List<SendDataObject> dataObject = Arrays.asList(gson.fromJson(json, SendDataObject[].class));
+        return dataObject;
     }
 
     private void writeToFile(String data) {
         try {
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FollowYou.config.pufferFile, context.MODE_PRIVATE));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FollowYou.config.pufferFile, Context.MODE_APPEND));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
         }
