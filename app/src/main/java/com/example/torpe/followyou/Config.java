@@ -20,6 +20,7 @@ public class Config {
     private Gson gson = new Gson();
 
     public String userId;
+    public String pufferFile;
     SimpleDateFormat df = new SimpleDateFormat("HH:mm");
     private SharedPreferences prefs;
     String sendingDaysKey = "com.example.torpe.followyou.sending_days";
@@ -29,14 +30,8 @@ public class Config {
     public Config(Context context) {
         mContext = context;
         prefs = context.getSharedPreferences("com.example.torpe.followyou", Context.MODE_PRIVATE);
-        try {
-            Date date = df.parse(this.mContext.getResources().getString(R.string.maxTime));
-            //maxTime = new Time(date.getHours(),date.getMinutes(),0);
-            //Log.e("Config:", maxTime.toString());
-        } catch (ParseException ex) {
-            ex.printStackTrace();
-        }
         userId = mContext.getResources().getString(R.string.userId);
+        pufferFile = mContext.getResources().getString(R.string.pufferFile);
     }
 
     public void getNewConfig() {

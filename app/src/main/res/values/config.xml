@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="userId" type="string">ia95ir</item>
+    <item name="pufferFile" type="string">puffer.json</item>
+    pufferFile
 </resources>

@@ -36,7 +36,7 @@ public class ServerCommunication {
     private HttpClient httpclient;
 
     public ServerCommunication(Context context) {
-        this.userid = MainActivity.config.userId;
+        this.userid = FollowYou.config.userId;
         this.getConnection();
         this.mContext = context;
     }

@@ -22,7 +22,7 @@ public class DataCollector {
         Calendar c = Calendar.getInstance();
         String formattedDate = df.format(c.getTime());
         gps.getLocation();
-        dataObject = new SendDataObject(gps.getLatitude(),gps.getLongitude(),formattedDate,MainActivity.config.userId,0);
+        dataObject = new SendDataObject(gps.getLatitude(),gps.getLongitude(),formattedDate,FollowYou.config.userId,0);
         return  dataObject;
     }
 }
