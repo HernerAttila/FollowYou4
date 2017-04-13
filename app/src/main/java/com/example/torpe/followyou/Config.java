@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import com.google.gson.Gson;
 
@@ -21,11 +24,17 @@ public class Config {
 
     public String userId;
     public String pufferFile;
-    SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-    private SharedPreferences prefs;
-    String sendingDaysKey = "com.example.torpe.followyou.sending_days";
-    String intervallumKey = "com.example.torpe.followyou.intervallum";
 
+    private Date date;
+    private Date dateCompareStart;
+    private Date dateCompareEnd;
+    private SimpleDateFormat inputParser = new SimpleDateFormat("H:mm");
+
+    private SharedPreferences prefs;
+    String sendingDaysKey = "com.example.torpe.followyou.sendingDays";
+    String intervallumKey = "com.example.torpe.followyou.intervallum";
+    String startTimeKey = "com.example.torpe.followyou.startTime";
+    String endTimeKey = "com.example.torpe.followyou.endTime";
 
     public Config(Context context) {
         mContext = context;
@@ -44,7 +53,9 @@ public class Config {
         if(dataObject.is_user) {
             prefs.edit().putInt(intervallumKey, dataObject.intervallum).commit();
             prefs.edit().putString(sendingDaysKey, dataObject.sending_days).commit();
-            //{"is_user":true,"is_sender":true,"sending_days":"1;2;3;4;5;","start_hour":7,"start_min":0,"end_hour":19,"end_min":0,"intervallum":3}
+            prefs.edit().putString(startTimeKey, dataObject.start_hour+":"+dataObject.start_min).commit();
+            prefs.edit().putString(endTimeKey, dataObject.end_hour+":"+dataObject.end_min).commit();
+            FollowYou.startService();
         }
         else{
             FollowYou.stopService();
@@ -57,7 +68,50 @@ public class Config {
         return intervallum;
     }
 
-    public String sendingDays() {
+    public String getSendingDays() {
         return prefs.getString(sendingDaysKey, "");
+    }
+
+    public String getStartTime() {
+       return prefs.getString(startTimeKey, "0:00");
+    }
+
+    public String getEndTime() {
+        return prefs.getString(endTimeKey, "23:59");
+    }
+
+    public boolean isSendingTime() {
+        Calendar now = Calendar.getInstance(Locale.GERMANY);
+        int day = now.get(Calendar.DAY_OF_WEEK);
+
+        if(!isInSendingDays(day)){
+            return false;
+        }
+
+        int hour = now.get(Calendar.HOUR_OF_DAY);
+        int minute = now.get(Calendar.MINUTE);
+
+        date = parseDate(hour + ":" + minute);
+        dateCompareStart = parseDate(getStartTime());
+        dateCompareEnd = parseDate(getEndTime());
+
+        if ((!dateCompareStart.after(date)) && (!dateCompareEnd.before(date))) {
+            return true;
+        }
+        return false;
+    }
+
+    private Date parseDate(String date) {
+
+        try {
+            return inputParser.parse(date);
+        } catch (java.text.ParseException e) {
+            return new Date(0);
+        }
+    }
+
+    private boolean isInSendingDays(int day){
+        List<String> days = Arrays.asList(getSendingDays().split(";"));
+        return days.contains(new Integer(day).toString());
     }
 }

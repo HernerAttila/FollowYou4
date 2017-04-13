@@ -26,6 +26,7 @@ public class FollowYou extends Service {
     public SendDataObject sendDataObject;
 
     private static Timer timer = new Timer();
+    private static TimerTask timerTask;
     private static Context ctx;
 
     public IBinder onBind(Intent arg0)
@@ -44,12 +45,12 @@ public class FollowYou extends Service {
         if(serverCommunication.isConnected()) {
             config.getNewConfig();
         }
-        startService();
+        timerTask = new mainTask();
     }
 
-    private void startService()
+    public static void startService()
     {
-        timer.scheduleAtFixedRate(new mainTask(), 0, 1000*60*config.getIntervallum());
+        timer.scheduleAtFixedRate(timerTask, 0, 1000*60*config.getIntervallum());
     }
 
     public static void stopService(){
@@ -61,6 +62,9 @@ public class FollowYou extends Service {
     {
         public void run()
         {
+            if(!config.isSendingTime()){
+                return;
+            }
             sendDataObject = dataCollector.collectData();
             Puffer puffer = new Puffer(ctx);
             if(serverCommunication.isConnected()) {
