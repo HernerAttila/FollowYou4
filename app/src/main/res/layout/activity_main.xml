@@ -6,15 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.example.torpe.followyou.MainActivity">
 
-    <Button
-        android:id="@+id/btnGetData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Button"
-        tools:layout_editor_absoluteX="16dp"
-        android:layout_marginTop="88dp"
-        app:layout_constraintTop_toBottomOf="@+id/timerLabel" />
-
     <TextView
         android:id="@+id/lattitudeTextView"
         android:layout_width="wrap_content"
@@ -78,7 +69,7 @@
         android:text="TextView"
         app:layout_constraintTop_toBottomOf="@+id/timerTextView"
         app:layout_constraintLeft_toRightOf="@+id/textView2"
-        android:layout_marginLeft="120dp" />
+        android:layout_marginLeft="108dp" />
 
     <TextView
         android:id="@+id/textView2"
@@ -88,5 +79,24 @@
         android:text="Intervallum"
         app:layout_constraintTop_toBottomOf="@+id/timerLabel"
         tools:layout_editor_absoluteX="16dp" />
+
+    <TextView
+        android:id="@+id/userIdLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="31dp"
+        android:text="userId"
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        tools:layout_editor_absoluteX="16dp" />
+
+    <TextView
+        android:id="@+id/userIdTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="139dp"
+        android:layout_marginTop="31dp"
+        android:text="TextView"
+        app:layout_constraintLeft_toRightOf="@+id/userIdLabel"
+        app:layout_constraintTop_toBottomOf="@+id/intervallumTextView" />
 
 </android.support.constraint.ConstraintLayout>

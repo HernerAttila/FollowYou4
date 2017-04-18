@@ -93,6 +93,7 @@ public class FollowYou extends Service {
         intent.putExtra("Longitude", new Double(sendDataObject.Longitude).toString());
         intent.putExtra("Time", sendDataObject.Time);
         intent.putExtra("Intervallum", new Integer(config.getIntervallum()).toString());
+        intent.putExtra("userId", config.userId);
         LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
     }
 

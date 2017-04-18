@@ -25,6 +25,13 @@ public class Puffer {
 
     public Puffer(Context context){
         this.context = context;
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FollowYou.config.pufferFile, Context.MODE_APPEND));
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
     }
 
     public void add(SendDataObject data){

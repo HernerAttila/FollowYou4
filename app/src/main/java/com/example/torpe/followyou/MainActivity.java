@@ -37,10 +37,12 @@ public class MainActivity extends AppCompatActivity {
             TextView longitudeTextView = (TextView) findViewById(R.id.longitudeTextView);
             TextView timerTextView = (TextView) findViewById(R.id.timerTextView);
             TextView intervallumTextView = (TextView) findViewById(R.id.intervallumTextView);
+            TextView userIdTextView = (TextView) findViewById(R.id.userIdTextView);
             lattitudeTextView.setText(intent.getStringExtra("Latitude"));
             longitudeTextView.setText(intent.getStringExtra("Longitude"));
             intervallumTextView.setText(intent.getStringExtra("Intervallum"));
             timerTextView.setText(intent.getStringExtra("Time"));
+            userIdTextView.setText(intent.getStringExtra("userId"));
         }
     };
 
