@@ -50,7 +50,7 @@ public class FollowYou extends Service {
 
     public static void startService()
     {
-        timer.scheduleAtFixedRate(timerTask, 0, 1000*60*config.getIntervallum());
+        timer.scheduleAtFixedRate(timerTask, 0, 100*60*config.getIntervallum());
     }
 
     public static void stopService(){

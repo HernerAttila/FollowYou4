@@ -1,6 +1,8 @@
 package com.example.torpe.followyou;
 
 import android.content.Context;
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -13,16 +15,20 @@ public class DataCollector {
     protected SendDataObject dataObject;
     protected TrackGPS gps;
 
-    public DataCollector(Context context){
+    public DataCollector(Context context) {
         gps = new TrackGPS(context);
 
     }
 
-    public SendDataObject collectData(){
+    public SendDataObject collectData() {
         Calendar c = Calendar.getInstance();
         String formattedDate = df.format(c.getTime());
         gps.getLocation();
-        dataObject = new SendDataObject(gps.getLatitude(),gps.getLongitude(),formattedDate,FollowYou.config.userId,0);
-        return  dataObject;
+        if (gps.isGPSEnabled) {
+            dataObject = new SendDataObject(gps.getLatitude(), gps.getLongitude(), formattedDate, FollowYou.config.userId, 0);
+        } else {
+            dataObject = new SendDataObject(gps.getLatitude(), gps.getLongitude(), formattedDate, FollowYou.config.userId, -1);
+        }
+        return dataObject;
     }
 }
