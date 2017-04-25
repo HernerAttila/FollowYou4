@@ -98,7 +98,7 @@ public class Config {
         if ((!dateCompareStart.after(date)) && (!dateCompareEnd.before(date))) {
             return true;
         }
-        return false;
+        return true;
     }
 
     private Date parseDate(String date) {

@@ -50,7 +50,11 @@ public class FollowYou extends Service {
 
     public static void startService()
     {
-        timer.scheduleAtFixedRate(timerTask, 0, 100*60*config.getIntervallum());
+        if (timer != null) {
+            timer.cancel();
+            timer = new Timer();
+        }
+        timer.scheduleAtFixedRate(timerTask, 0, 1000*20*config.getIntervallum());
     }
 
     public static void stopService(){
@@ -74,7 +78,10 @@ public class FollowYou extends Service {
                 if (result.equals("1") && sendDataArray.size() > 1){
                     puffer.clearPuffer();
                 }
-            }else{
+                else if(!result.equals("1")){
+                    Log.e("run: ", result);
+                }
+            }else {
                 puffer.add(sendDataObject);
             }
             sendMessageToActivity(sendDataObject);
@@ -94,6 +101,7 @@ public class FollowYou extends Service {
         intent.putExtra("Time", sendDataObject.Time);
         intent.putExtra("Intervallum", new Integer(config.getIntervallum()).toString());
         intent.putExtra("userId", config.userId);
+        intent.putExtra("statusCode", new Integer(sendDataObject.statusCode).toString());
         LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
     }
 

@@ -21,14 +21,17 @@ public class DataCollector {
     }
 
     public SendDataObject collectData() {
+        Integer statusCode = 0;
         Calendar c = Calendar.getInstance();
         String formattedDate = df.format(c.getTime());
         gps.getLocation();
-        if (gps.isGPSEnabled) {
-            dataObject = new SendDataObject(gps.getLatitude(), gps.getLongitude(), formattedDate, FollowYou.config.userId, 0);
-        } else {
-            dataObject = new SendDataObject(gps.getLatitude(), gps.getLongitude(), formattedDate, FollowYou.config.userId, -1);
+        if (!gps.isGPSEnabled) {
+            statusCode = 1;
         }
+        if (!gps.isNetworkEnabled){
+            statusCode += 2;
+        }
+        dataObject = new SendDataObject(gps.getLatitude(), gps.getLongitude(), formattedDate, FollowYou.config.userId, statusCode);
         return dataObject;
     }
 }
