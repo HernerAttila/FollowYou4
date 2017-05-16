@@ -40,6 +40,11 @@ public class Puffer {
         writeToFile(json);
     }
 
+    public void addLatest(SendDataObject data){
+        String json =  this.gson.toJson(data);
+        writeToLatestFile(json);
+    }
+
     public void clearPuffer(){
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FollowYou.config.pufferFile, Context.MODE_PRIVATE));
@@ -57,9 +62,26 @@ public class Puffer {
         return dataObject;
     }
 
+    public SendDataObject getLatest(){
+        String json = readFromLatestFile();
+        SendDataObject dataObject = gson.fromJson(json, SendDataObject.class);
+        return dataObject;
+    }
+
     private void writeToFile(String data) {
         try {
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FollowYou.config.pufferFile, Context.MODE_APPEND));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    private void writeToLatestFile(String data) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(FollowYou.config.pufferLatestFile, Context.MODE_PRIVATE));
             outputStreamWriter.write(data);
             outputStreamWriter.close();
         }
@@ -74,6 +96,36 @@ public class Puffer {
 
         try {
             InputStream inputStream = context.openFileInput(FollowYou.config.pufferFile);
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
+    }
+
+    private String readFromLatestFile() {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput(FollowYou.config.pufferLatestFile);
 
             if ( inputStream != null ) {
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);

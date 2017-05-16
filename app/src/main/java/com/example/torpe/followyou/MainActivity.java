@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
-    Intent mServiceIntent;
+    Intent mServiceIntent = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,31 +33,44 @@ public class MainActivity extends AppCompatActivity {
         }
         LocalBroadcastManager.getInstance(MainActivity.this).registerReceiver(
                 mMessageReceiver, new IntentFilter("GPSLocationUpdates"));
+        start();
+    }
 
-        mServiceIntent = new Intent(MainActivity.this, FollowYou.class);
-        MainActivity.this.startService(mServiceIntent);
+    public void restart(){
+        MainActivity.this.stopService(mServiceIntent);
+        Intent i = getBaseContext().getPackageManager()
+                .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
+        System.exit(0);
+        start();
     }
 
     public void start() {
-
+        mServiceIntent = new Intent(MainActivity.this, FollowYou.class);
+        MainActivity.this.startService(mServiceIntent);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            TextView lattitudeTextView = (TextView) findViewById(R.id.lattitudeTextView);
-            TextView longitudeTextView = (TextView) findViewById(R.id.longitudeTextView);
-            TextView timerTextView = (TextView) findViewById(R.id.timerTextView);
-            TextView intervallumTextView = (TextView) findViewById(R.id.intervallumTextView);
-            TextView userIdTextView = (TextView) findViewById(R.id.userIdTextView);
-            TextView statusCodeTextView = (TextView) findViewById(R.id.statusCodeTextView);
-            lattitudeTextView.setText(intent.getStringExtra("Latitude"));
-            longitudeTextView.setText(intent.getStringExtra("Longitude"));
-            intervallumTextView.setText(intent.getStringExtra("Intervallum"));
-            timerTextView.setText(intent.getStringExtra("Time"));
-            userIdTextView.setText(intent.getStringExtra("userId"));
-            statusCodeTextView.setText(intent.getStringExtra("statusCode"));
+            if(intent.getStringExtra("Type").equals("restart")){
+                restart();
+            }else {
+
+                TextView lattitudeTextView = (TextView) findViewById(R.id.lattitudeTextView);
+                TextView longitudeTextView = (TextView) findViewById(R.id.longitudeTextView);
+                TextView timerTextView = (TextView) findViewById(R.id.timerTextView);
+                TextView intervallumTextView = (TextView) findViewById(R.id.intervallumTextView);
+                TextView userIdTextView = (TextView) findViewById(R.id.userIdTextView);
+                TextView statusCodeTextView = (TextView) findViewById(R.id.statusCodeTextView);
+                lattitudeTextView.setText(intent.getStringExtra("Latitude"));
+                longitudeTextView.setText(intent.getStringExtra("Longitude"));
+                intervallumTextView.setText(intent.getStringExtra("Intervallum"));
+                timerTextView.setText(intent.getStringExtra("Time"));
+                userIdTextView.setText(intent.getStringExtra("userId"));
+                statusCodeTextView.setText(intent.getStringExtra("statusCode"));
+            }
         }
     };
 

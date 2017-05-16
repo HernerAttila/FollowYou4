@@ -30,6 +30,7 @@ public class Config {
 
     public String userId;
     public String pufferFile;
+    public String pufferLatestFile;
     public String dataCollectorTimeFile;
     public String configTimeFile;
 
@@ -50,6 +51,7 @@ public class Config {
         prefs = context.getSharedPreferences("com.example.torpe.followyou", Context.MODE_PRIVATE);
         userId = mContext.getResources().getString(R.string.userId);
         pufferFile = mContext.getResources().getString(R.string.pufferFile);
+        pufferLatestFile = mContext.getResources().getString(R.string.pufferLatestFile);
         dataCollectorTimeFile = mContext.getResources().getString(R.string.dataCollectorTimeFile);
         configTimeFile = mContext.getResources().getString(R.string.configTimeFile);
         try {
@@ -69,6 +71,7 @@ public class Config {
     public void setNewConfig(String dataStr) {
         GetDataObject dataObject = (gson.fromJson(dataStr, GetDataObject.class));
         if(dataObject.is_user) {
+            boolean restart = (getIntervallum() != dataObject.intervallum);
             prefs.edit().putInt(intervallumKey, dataObject.intervallum).commit();
             prefs.edit().putString(sendingDaysKey, dataObject.sending_days).commit();
             prefs.edit().putString(startTimeKey, dataObject.start_hour+":"+dataObject.start_min).commit();
@@ -76,10 +79,11 @@ public class Config {
             Calendar c = Calendar.getInstance();
             String formattedDate = df.format(c.getTime());
             writeToFile(formattedDate);
-            FollowYou.startService();
-        }
-        else{
-            FollowYou.stopService();
+            if(FollowYou.timer == null) {
+                FollowYou.startService();
+            } else if (restart){
+                FollowYou.restartService();
+            }
         }
     }
 
@@ -105,7 +109,7 @@ public class Config {
         Date lastSendingTime = parseConfigTime(lastSendingTimeStr);
         Date nowDate = new Date();
         long timeDiff = Math.abs(lastSendingTime.getTime() - nowDate.getTime());
-        if (timeDiff < 1000*60*getIntervallum()){
+        if (timeDiff < (1000*60*getIntervallum())-1000){
             return false;
         }
 
@@ -133,7 +137,7 @@ public class Config {
         Date lastGetConfigTime = parseConfigTime(lastGetConfig);
         Date now = new Date();
         long timeDiff = Math.abs(lastGetConfigTime.getTime() - now.getTime());
-        return timeDiff > 1000*60*60;
+        return timeDiff > (1000*60*60)-1000;
     }
 
     private Date parseConfigTime(String date) {

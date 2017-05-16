@@ -1,10 +1,8 @@
 package com.example.torpe.followyou;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -24,8 +22,7 @@ public class FollowYou extends Service {
     protected DataCollector dataCollector;
     protected Puffer puffer;
     public SendDataObject sendDataObject;
-
-    private static Timer timer = new Timer();
+    public static Timer timer = null;
     private static TimerTask timerTask;
     private static Context ctx;
 
@@ -41,6 +38,10 @@ public class FollowYou extends Service {
         config = new Config(FollowYou.this);
         dataCollector = new DataCollector(FollowYou.this);
         puffer = new Puffer(FollowYou.this);
+        SendDataObject dataObject = puffer.getLatest();
+        if(dataObject != null) {
+            sendMessageToActivity(dataObject, "");
+        }
         serverCommunication = new ServerCommunication(FollowYou.this);
         if(serverCommunication.isConnected()) {
             config.getNewConfig();
@@ -50,16 +51,13 @@ public class FollowYou extends Service {
 
     public static void startService()
     {
-        if (timer != null) {
-            timer.cancel();
-            timer = new Timer();
-        }
+        timer = new Timer();
         timer.scheduleAtFixedRate(timerTask, 0, 1000*60*config.getIntervallum());
     }
 
-    public static void stopService(){
+    public static void restartService(){
         timer.cancel();
-        Log.e("stopService:","stopped");
+        sendMessageToActivity(null, "restart");
     }
 
     private class mainTask extends TimerTask
@@ -68,13 +66,13 @@ public class FollowYou extends Service {
         {
             if(config.isConfigGetTime() && serverCommunication.isConnected()){
                 config.getNewConfig();
-                return;
             }
             if(!config.isSendingTime(dataCollector.getLastCollectTime())){
                 return;
             }
             sendDataObject = dataCollector.collectData();
             Puffer puffer = new Puffer(ctx);
+            puffer.addLatest(sendDataObject);
             if(serverCommunication.isConnected()) {
                 List<SendDataObject> sendDataArray = new ArrayList<SendDataObject>(puffer.getAll());
                 sendDataArray.add(sendDataObject);
@@ -88,7 +86,7 @@ public class FollowYou extends Service {
             }else {
                 puffer.add(sendDataObject);
             }
-            sendMessageToActivity(sendDataObject);
+            sendMessageToActivity(sendDataObject, "");
         }
     }
 
@@ -97,14 +95,17 @@ public class FollowYou extends Service {
         super.onDestroy();
     }
 
-    private static void sendMessageToActivity(SendDataObject sendDataObject) {
+    private static void sendMessageToActivity(SendDataObject sendDataObject, String type ) {
         Intent intent = new Intent("GPSLocationUpdates");
-        intent.putExtra("Latitude", new Double(sendDataObject.Latitude).toString());
-        intent.putExtra("Longitude", new Double(sendDataObject.Longitude).toString());
-        intent.putExtra("Time", sendDataObject.Time);
-        intent.putExtra("Intervallum", new Integer(config.getIntervallum()).toString());
-        intent.putExtra("userId", config.userId);
-        intent.putExtra("statusCode", new Integer(sendDataObject.statusCode).toString());
+        intent.putExtra("Type", type);
+        if(!type.equals("restart")) {
+            intent.putExtra("Latitude", new Double(sendDataObject.Latitude).toString());
+            intent.putExtra("Longitude", new Double(sendDataObject.Longitude).toString());
+            intent.putExtra("Time", sendDataObject.Time);
+            intent.putExtra("Intervallum", new Integer(config.getIntervallum()).toString());
+            intent.putExtra("userId", config.userId);
+            intent.putExtra("statusCode", new Integer(sendDataObject.statusCode).toString());
+        }
         LocalBroadcastManager.getInstance(ctx).sendBroadcast(intent);
     }
 
