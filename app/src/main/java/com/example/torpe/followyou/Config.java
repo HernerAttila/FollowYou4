@@ -4,6 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -24,11 +30,14 @@ public class Config {
 
     public String userId;
     public String pufferFile;
+    public String dataCollectorTimeFile;
+    public String configTimeFile;
 
     private Date date;
     private Date dateCompareStart;
     private Date dateCompareEnd;
     private SimpleDateFormat inputParser = new SimpleDateFormat("H:mm");
+    private SimpleDateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 
     private SharedPreferences prefs;
     String sendingDaysKey = "com.example.torpe.followyou.sendingDays";
@@ -41,6 +50,15 @@ public class Config {
         prefs = context.getSharedPreferences("com.example.torpe.followyou", Context.MODE_PRIVATE);
         userId = mContext.getResources().getString(R.string.userId);
         pufferFile = mContext.getResources().getString(R.string.pufferFile);
+        dataCollectorTimeFile = mContext.getResources().getString(R.string.dataCollectorTimeFile);
+        configTimeFile = mContext.getResources().getString(R.string.configTimeFile);
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(configTimeFile, Context.MODE_APPEND));
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
     }
 
     public void getNewConfig() {
@@ -55,6 +73,9 @@ public class Config {
             prefs.edit().putString(sendingDaysKey, dataObject.sending_days).commit();
             prefs.edit().putString(startTimeKey, dataObject.start_hour+":"+dataObject.start_min).commit();
             prefs.edit().putString(endTimeKey, dataObject.end_hour+":"+dataObject.end_min).commit();
+            Calendar c = Calendar.getInstance();
+            String formattedDate = df.format(c.getTime());
+            writeToFile(formattedDate);
             FollowYou.startService();
         }
         else{
@@ -80,10 +101,16 @@ public class Config {
         return prefs.getString(endTimeKey, "23:59");
     }
 
-    public boolean isSendingTime() {
+    public boolean isSendingTime(String lastSendingTimeStr) {
+        Date lastSendingTime = parseConfigTime(lastSendingTimeStr);
+        Date nowDate = new Date();
+        long timeDiff = Math.abs(lastSendingTime.getTime() - nowDate.getTime());
+        if (timeDiff < 1000*60*getIntervallum()){
+            return false;
+        }
+
         Calendar now = Calendar.getInstance(Locale.GERMANY);
         int day = now.get(Calendar.DAY_OF_WEEK);
-
         if(!isInSendingDays(day)){
             return false;
         }
@@ -98,11 +125,26 @@ public class Config {
         if ((!dateCompareStart.after(date)) && (!dateCompareEnd.before(date))) {
             return true;
         }
-        return true;
+        return false;
+    }
+
+    public boolean isConfigGetTime (){
+        String lastGetConfig = readFromFile();
+        Date lastGetConfigTime = parseConfigTime(lastGetConfig);
+        Date now = new Date();
+        long timeDiff = Math.abs(lastGetConfigTime.getTime() - now.getTime());
+        return timeDiff > 1000*60*60;
+    }
+
+    private Date parseConfigTime(String date) {
+        try {
+            return df.parse(date);
+        } catch (java.text.ParseException e) {
+            return new Date(0);
+        }
     }
 
     private Date parseDate(String date) {
-
         try {
             return inputParser.parse(date);
         } catch (java.text.ParseException e) {
@@ -113,5 +155,45 @@ public class Config {
     private boolean isInSendingDays(int day){
         List<String> days = Arrays.asList(getSendingDays().split(";"));
         return days.contains(new Integer(day).toString());
+    }
+
+    private void writeToFile(String data) {
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(mContext.openFileOutput(configTimeFile, Context.MODE_PRIVATE));
+            outputStreamWriter.write(data);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+    }
+
+    private String readFromFile() {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = mContext.openFileInput(configTimeFile);
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+
+        return ret;
     }
 }

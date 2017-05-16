@@ -49,6 +49,9 @@ public class ServerCommunication {
         InputStream inputStream = null;
         String result = "";
         Log.e ("sendLocationData",this.gson.toJson(sendDataArray));
+        if(true){
+            return "1";
+        }
         try {
             HttpPost httpPost = new HttpPost("https://followyou.eu/webservice/saver.php");
             String json = this.gson.toJson(sendDataArray);

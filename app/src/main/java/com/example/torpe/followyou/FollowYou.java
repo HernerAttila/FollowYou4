@@ -54,7 +54,7 @@ public class FollowYou extends Service {
             timer.cancel();
             timer = new Timer();
         }
-        timer.scheduleAtFixedRate(timerTask, 0, 1000*20*config.getIntervallum());
+        timer.scheduleAtFixedRate(timerTask, 0, 1000*60*config.getIntervallum());
     }
 
     public static void stopService(){
@@ -66,7 +66,11 @@ public class FollowYou extends Service {
     {
         public void run()
         {
-            if(!config.isSendingTime()){
+            if(config.isConfigGetTime() && serverCommunication.isConnected()){
+                config.getNewConfig();
+                return;
+            }
+            if(!config.isSendingTime(dataCollector.getLastCollectTime())){
                 return;
             }
             sendDataObject = dataCollector.collectData();
@@ -95,7 +99,6 @@ public class FollowYou extends Service {
 
     private static void sendMessageToActivity(SendDataObject sendDataObject) {
         Intent intent = new Intent("GPSLocationUpdates");
-        // You can also include some extra data.
         intent.putExtra("Latitude", new Double(sendDataObject.Latitude).toString());
         intent.putExtra("Longitude", new Double(sendDataObject.Longitude).toString());
         intent.putExtra("Time", sendDataObject.Time);

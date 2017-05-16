@@ -2,4 +2,6 @@
 <resources>
     <item name="userId" type="string">ia95ir</item>
     <item name="pufferFile" type="string">"puffer.json"</item>
+    <item name="dataCollectorTimeFile" type="string">"dct.json"</item>
+    <item name="configTimeFile" type="string">"configtime.json"</item>
 </resources>
