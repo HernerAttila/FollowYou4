@@ -45,6 +45,8 @@ public class FollowYou extends Service {
         serverCommunication = new ServerCommunication(FollowYou.this);
         if(serverCommunication.isConnected()) {
             config.getNewConfig();
+        } else if (config.getIntervallum() != 0){
+            startService();
         }
         timerTask = new mainTask();
     }
