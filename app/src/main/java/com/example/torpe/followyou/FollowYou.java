@@ -43,12 +43,13 @@ public class FollowYou extends Service {
             sendMessageToActivity(dataObject, "");
         }
         serverCommunication = new ServerCommunication(FollowYou.this);
+        timerTask = new mainTask();
         if(serverCommunication.isConnected()) {
             config.getNewConfig();
         } else if (config.getIntervallum() != 0){
+            Log.e("start","start");
             startService();
         }
-        timerTask = new mainTask();
     }
 
     public static void startService()
